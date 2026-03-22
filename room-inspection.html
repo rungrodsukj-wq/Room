@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ตรวจห้องพัก</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --card: #22263a;
+      --border: #2e3350;
+      --accent: #4f8ef7;
+      --accent2: #38d9a9;
+      --warn: #ffa94d;
+      --text: #e8eaf0;
+      --muted: #7c83a0;
+      --pass: #38d9a9;
+      --fail: #ff6b6b;
+      --radius: 14px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 110px;
+    }
+
+    .header {
+      background: #151829;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-row input {
+      flex: 1;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .input-row input:focus {
+      border-color: var(--accent);
+    }
+
+    .input-row input::placeholder {
+      color: var(--muted);
+    }
+
+    .prog-wrap {
+      padding: 10px 16px 0;
+    }
+
+    .prog-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .prog-bar {
+      height: 5px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+
+    .config-card {
+      margin: 12px 14px 0;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .config-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 8px;
+    }
+
+    .config-card label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+      margin-top: 9px;
+    }
+
+    .config-card label:first-of-type {
+      margin-top: 0;
+    }
+
+    .config-card input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .config-card input:focus {
+      border-color: var(--accent);
+    }
+
+    .config-card input::placeholder {
+      color: var(--muted);
+    }
+
+    .config-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 9px;
+      background: rgba(79, 142, 247, 0.12);
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      border-radius: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .helper {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 7px;
+      line-height: 1.6;
+    }
+
+    .section {
+      margin: 12px 14px 0;
+    }
+
+    .sec-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0 4px;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .sec-title span {
+      font-size: 15px;
+    }
+
+    .item-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 9px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .item-card.pass {
+      border-color: var(--pass);
+    }
+
+    .item-card.fail {
+      border-color: var(--fail);
+    }
+
+    .item-card.na {
+      border-color: var(--muted);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .item-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      background: var(--surface);
+    }
+
+    .item-title .name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .item-title .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .expand-icon {
+      color: var(--muted);
+      font-size: 11px;
+      transition: transform 0.2s;
+      margin-left: auto;
+    }
+
+    .item-card.open .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .status-row {
+      display: none;
+      flex-direction: row;
+      gap: 7px;
+      padding: 0 14px 12px;
+    }
+
+    .sbtn {
+      flex: 1;
+      padding: 10px 4px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      transition: all 0.15s;
+    }
+
+    .sbtn .bi {
+      font-size: 17px;
+    }
+
+    .sbtn.ap {
+      background: rgba(56, 217, 169, 0.15);
+      border-color: var(--pass);
+      color: var(--pass);
+    }
+
+    .sbtn.af {
+      background: rgba(255, 107, 107, 0.15);
+      border-color: var(--fail);
+      color: var(--fail);
+    }
+
+    .sbtn.an {
+      background: rgba(124, 131, 160, 0.15);
+      border-color: var(--muted);
+      color: var(--muted);
+    }
+
+    .note-wrap {
+      display: none;
+      padding: 0 14px 13px;
+    }
+
+    .note-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      min-height: 64px;
+      line-height: 1.5;
+    }
+
+    .note-input:focus {
+      border-color: var(--accent);
+    }
+
+    .note-input::placeholder {
+      color: var(--muted);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1.5px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      gap: 9px;
+      z-index: 100;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--accent), #3a6fd8);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .btn-primary:active {
+      opacity: 0.82;
+    }
+
+    .btn-secondary {
+      padding: 13px 16px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Sarabun', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:active {
+      background: var(--border);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 200;
+      align-items: flex-end;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 18px 16px 40px;
+      border-top: 1.5px solid var(--border);
+    }
+
+    .modal-handle {
+      width: 38px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 14px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .modal-head h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .hist-filter {
+      display: flex;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .hist-filter input {
+      flex: 1;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .hist-filter input:focus {
+      border-color: var(--accent);
+    }
+
+    .hist-filter input::placeholder {
+      color: var(--muted);
+    }
+
+    .load-btn {
+      padding: 8px 14px;
+      background: rgba(79, 142, 247, 0.12);
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      border-radius: 9px;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .hist-row {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      margin-bottom: 7px;
+    }
+
+    .hist-row .hr-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .hr-room {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .hr-time {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .hr-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 6px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .tag-pass {
+      background: rgba(56, 217, 169, 0.18);
+      color: var(--pass);
+    }
+
+    .tag-fail {
+      background: rgba(255, 107, 107, 0.18);
+      color: var(--fail);
+    }
+
+    .tag-na {
+      background: rgba(124, 131, 160, 0.18);
+      color: var(--muted);
+    }
+
+    .hr-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 30px 0;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 9px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 300;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .loading.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading p {
+      color: var(--text);
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <div class="header-top">
+      <h1>🏠 ตรวจห้องพัก</h1>
+      <span class="badge" id="progressBadge">0/8</span>
+    </div>
+    <div class="input-row">
+      <input type="text" id="roomNo" placeholder="หมายเลขห้อง เช่น 101" />
+      <input type="text" id="inspector" placeholder="ชื่อผู้ตรวจ" />
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-info">
+      <span id="progText">ยังไม่ได้ตรวจ</span>
+      <span id="progPct">0%</span>
+    </div>
+    <div class="prog-bar">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+  </div>
+
+
+
+  <div id="checklistContainer"></div>
+
+  <div class="bottom-bar">
+    <button class="btn-primary" onclick="submitInspection()">📤 ส่งและบันทึกลงชีท</button>
+    <button class="btn-secondary" onclick="openModal('histModal')">📋 ประวัติ</button>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="histModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-head">
+        <h2>📋 ประวัติการตรวจ</h2>
+        <button class="close-btn" onclick="closeModal('histModal')">✕</button>
+      </div>
+      <div class="hist-filter">
+        <input type="text" id="filterRoom" placeholder="กรองตามเลขห้อง..." oninput="renderHistory()" />
+        <button class="load-btn" onclick="loadHistory()">🔄 โหลด</button>
+      </div>
+      <div id="historyContent">
+        <div class="empty-state">กด 🔄 โหลด เพื่อดึงข้อมูลจาก Sheet</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p id="loadingMsg">กำลังโหลด...</p>
+  </div>
+
+  <script>
+    const SECTIONS = [
+      {
+        id: 'odor', title: 'ที่ดักกลิ่นในห้องน้ำ', icon: '💧', items: [
+          { id: 'odor_wet', title: 'โซนเปียก', sub: 'ที่ดักกลิ่นโซนเปียก', icon: '🚿' },
+          { id: 'odor_dry', title: 'โซนแห้ง', sub: 'ที่ดักกลิ่นโซนแห้ง', icon: '🚽' },
+          { id: 'odor_balcony', title: 'บริเวณระเบียง', sub: 'ที่ดักกลิ่นระเบียง', icon: '🏠' },
+        ]
+      },
+      {
+        id: 'install', title: 'งานติดตั้งอุปกรณ์', icon: '🔧', items: [
+          { id: 'film_kitchen', title: 'ฟิล์มประตูห้องครัว', sub: 'เฉพาะครัวด้านหลัง', icon: '🎞️' },
+          { id: 'hinge_door', title: 'บานพับประตู', sub: 'ครบถ้วนและติดตั้งเรียบร้อย', icon: '🚪' },
+        ]
+      },
+      {
+        id: 'sign', title: 'ป้ายและเอกสารในห้อง', icon: '🪧', items: [
+          { id: 'sign_phone', title: 'ป้ายโทรศัพท์', sub: 'ติดตั้งครบและถูกต้อง', icon: '📞' },
+          { id: 'sign_kitchen', title: 'ป้ายคำแนะนำในตู้ครัวด้านบน', sub: 'ครบถ้วนและชัดเจน', icon: '📄' },
+        ]
+      },
+      {
+        id: 'service', title: 'ช่องเซอร์วิส', icon: '🔲', items: [
+          { id: 'svc_open', title: 'เปิด/ปิดได้ปกติ', sub: 'ทดสอบการใช้งาน', icon: '🔓' },
+          { id: 'svc_condition', title: 'สภาพพร้อมใช้งาน', sub: 'ไม่มีความเสียหาย', icon: '✅' },
+        ]
+      },
+    ];
+    const ALL_ITEMS = SECTIONS.flatMap(s => s.items);
+
+    let state = {};
+    let historyData = [];
+
+    function init() {
+      renderChecklist();
+    }
+
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5wPIm0gxKRcnt0E5OGt91-zuuFOym0ZT0zHbdtRPt1U3Kl2fKocGQ5__dPdIlNIRH/exec';
+
+    function getConfig() {
+      return { scriptUrl: SCRIPT_URL };
+    }
+
+    function saveConfig() { }
+
+    function renderChecklist() {
+      const c = document.getElementById('checklistContainer');
+      c.innerHTML = '';
+      SECTIONS.forEach(sec => {
+        const sd = document.createElement('div');
+        sd.className = 'section';
+        sd.innerHTML = `<div class="sec-title"><span>${sec.icon}</span>${sec.title}</div>`;
+        sec.items.forEach(item => sd.appendChild(makeCard(item)));
+        c.appendChild(sd);
+      });
+      updateProgress();
+    }
+
+    function makeCard(item) {
+      const st = state[item.id]?.status || '';
+      const div = document.createElement('div');
+      div.className = `item-card ${st}`;
+      div.id = `card_${item.id}`;
+      div.innerHTML = `
+    <div class="item-header" onclick="toggleCard('${item.id}')">
+      <div class="item-icon">${item.icon}</div>
+      <div class="item-title" style="flex:1">
+        <div class="name">${item.title}</div>
+        <div class="sub">${item.sub}</div>
+      </div>
+      <div class="expand-icon">▼</div>
+    </div>
+    <div class="status-row" id="sr_${item.id}">
+      <button class="sbtn ${st === 'pass' ? 'ap' : ''}" onclick="setStatus('${item.id}','pass')"><span class="bi">✅</span>ผ่าน</button>
+      <button class="sbtn ${st === 'fail' ? 'af' : ''}" onclick="setStatus('${item.id}','fail')"><span class="bi">❌</span>ไม่ผ่าน</button>
+      <button class="sbtn ${st === 'na' ? 'an' : ''}"   onclick="setStatus('${item.id}','na')"><span class="bi">➖</span>N/A</button>
+    </div>
+    <div class="note-wrap" id="nw_${item.id}">
+      <textarea class="note-input" id="note_${item.id}" placeholder="หมายเหตุ (ถ้ามี)..." onchange="saveNote('${item.id}')">${state[item.id]?.note || ''}</textarea>
+    </div>`;
+      return div;
+    }
+
+    function toggleCard(id) {
+      const card = document.getElementById(`card_${id}`);
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.item-card').forEach(c => {
+        c.classList.remove('open');
+        const ei = c.querySelector('.expand-icon');
+        if (ei) ei.style.transform = '';
+        const m = c.id.replace('card_', '');
+        const sr = document.getElementById(`sr_${m}`);
+        const nw = document.getElementById(`nw_${m}`);
+        if (sr) sr.style.display = 'none';
+        if (nw) nw.style.display = 'none';
+      });
+      if (!isOpen) {
+        card.classList.add('open');
+        card.querySelector('.expand-icon').style.transform = 'rotate(180deg)';
+        document.getElementById(`sr_${id}`).style.display = 'flex';
+        document.getElementById(`nw_${id}`).style.display = 'block';
+      }
+    }
+
+    function setStatus(id, status) {
+      if (!state[id]) state[id] = {};
+      state[id].status = status;
+      const card = document.getElementById(`card_${id}`);
+      card.className = `item-card open ${status}`;
+      card.querySelector('.expand-icon').style.transform = 'rotate(180deg)';
+      document.getElementById(`sr_${id}`).style.display = 'flex';
+      document.getElementById(`nw_${id}`).style.display = 'block';
+      card.querySelectorAll('.sbtn').forEach(b => {
+        b.className = 'sbtn';
+        const txt = b.textContent;
+        if (txt.includes('ผ่าน') && !txt.includes('ไม่') && status === 'pass') b.classList.add('ap');
+        else if (txt.includes('ไม่ผ่าน') && status === 'fail') b.classList.add('af');
+        else if (txt.includes('N/A') && status === 'na') b.classList.add('an');
+      });
+      updateProgress();
+    }
+
+    function saveNote(id) {
+      if (!state[id]) state[id] = {};
+      state[id].note = document.getElementById(`note_${id}`).value;
+    }
+
+    function updateProgress() {
+      const done = ALL_ITEMS.filter(i => state[i.id]?.status).length;
+      const total = ALL_ITEMS.length;
+      const pct = Math.round(done / total * 100);
+      const pass = ALL_ITEMS.filter(i => state[i.id]?.status === 'pass').length;
+      const fail = ALL_ITEMS.filter(i => state[i.id]?.status === 'fail').length;
+      document.getElementById('progressBadge').textContent = `${done}/${total}`;
+      document.getElementById('progFill').style.width = pct + '%';
+      document.getElementById('progPct').textContent = pct + '%';
+      document.getElementById('progText').textContent =
+        done === 0 ? 'ยังไม่ได้ตรวจ' : `ผ่าน ${pass} · ไม่ผ่าน ${fail} · เหลือ ${total - done}`;
+    }
+
+    async function submitInspection() {
+      const roomNo = document.getElementById('roomNo').value.trim();
+      const name = document.getElementById('inspector').value.trim();
+      if (!roomNo) { toast('⚠️ กรุณาระบุหมายเลขห้อง'); return; }
+      const cfg = getConfig();
+      if (!cfg.scriptUrl) { toast('⚠️ กรุณาใส่ Apps Script URL ก่อน'); return; }
+      const done = ALL_ITEMS.filter(i => state[i.id]?.status).length;
+      if (done === 0) { toast('⚠️ ยังไม่ได้ตรวจรายการใดเลย'); return; }
+
+      showLoading('กำลังบันทึกลงชีท...');
+      const payload = {
+        room: roomNo,
+        inspector: name || '-',
+        timestamp: new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }),
+        rows: ALL_ITEMS.map(item => {
+          const sec = SECTIONS.find(s => s.items.includes(item));
+          return {
+            section: sec.title,
+            item: item.title,
+            status: state[item.id]?.status || 'pending',
+            note: state[item.id]?.note || ''
+          };
+        })
+      };
+
+      try {
+        await fetch(cfg.scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        hideLoading();
+        toast('✅ บันทึกลงชีทแล้ว!');
+        setTimeout(() => {
+          if (confirm('บันทึกแล้ว!\nต้องการล้างข้อมูลเพื่อตรวจห้องใหม่?')) {
+            state = {};
+            document.getElementById('roomNo').value = '';
+            renderChecklist();
+          }
+        }, 300);
+      } catch (e) {
+        hideLoading();
+        toast('❌ ' + e.message);
+      }
+    }
+
+    async function loadHistory() {
+      const cfg = getConfig();
+      if (!cfg.scriptUrl) { toast('⚠️ กรุณาใส่ Apps Script URL ก่อน'); return; }
+      showLoading('กำลังดึงข้อมูล...');
+      try {
+        const res = await fetch(cfg.scriptUrl + '?t=' + Date.now());
+        const text = await res.text();
+        historyData = parseCSV(text);
+        hideLoading();
+        renderHistory();
+      } catch (e) {
+        hideLoading();
+        toast('❌ โหลดไม่ได้: ' + e.message);
+      }
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+      const headers = splitCSVLine(lines[0]);
+      return lines.slice(1).map(line => {
+        const cols = splitCSVLine(line);
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (cols[i] || ''));
+        return obj;
+      });
+    }
+
+    function splitCSVLine(line) {
+      const result = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQ = !inQ; continue; }
+        if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; continue; }
+        cur += ch;
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('historyContent');
+      const filter = document.getElementById('filterRoom').value.trim().toLowerCase();
+
+      if (historyData.length === 0) {
+        container.innerHTML = '<div class="empty-state">กด 🔄 โหลด เพื่อดึงข้อมูลจาก Sheet</div>';
+        return;
+      }
+
+      const groups = {};
+      historyData.forEach(row => {
+        const key = `${row['วันที่เวลา']}||${row['ห้อง']}`;
+        if (!groups[key]) groups[key] = { time: row['วันที่เวลา'], room: row['ห้อง'], inspector: row['ผู้ตรวจ'], items: [] };
+        groups[key].items.push(row);
+      });
+
+      let list = Object.values(groups).reverse();
+      if (filter) list = list.filter(g => g.room.toLowerCase().includes(filter));
+      if (list.length === 0) { container.innerHTML = '<div class="empty-state">ไม่พบข้อมูลห้องนี้</div>'; return; }
+
+      container.innerHTML = list.map(g => {
+        const pass = g.items.filter(i => i['ผล'] === 'pass').length;
+        const fails = g.items.filter(i => i['ผล'] === 'fail');
+        const notes = g.items.filter(i => i['หมายเหตุ']).map(i => `${i['รายการ']}: ${i['หมายเหตุ']}`).join(' · ');
+        return `<div class="hist-row">
+      <div class="hr-top">
+        <span class="hr-room">🏠 ห้อง ${g.room}</span>
+        <span class="hr-time">${g.time}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">👤 ${g.inspector}</div>
+      <div class="hr-items">
+        <span class="tag tag-pass">✅ ผ่าน ${pass}</span>
+        ${fails.length > 0 ? `<span class="tag tag-fail">❌ ไม่ผ่าน ${fails.length}</span>` : ''}
+        ${fails.map(i => `<span class="tag tag-fail" style="font-size:10px">${i['รายการ']}</span>`).join('')}
+      </div>
+      ${notes ? `<div class="hr-note">💬 ${notes}</div>` : ''}
+    </div>`;
+      }).join('');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+      el.addEventListener('click', e => { if (e.target === el) el.classList.remove('show'); });
+    });
+
+    function showLoading(msg) { document.getElementById('loadingMsg').textContent = msg; document.getElementById('loading').classList.add('show'); }
+    function hideLoading() { document.getElementById('loading').classList.remove('show'); }
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
